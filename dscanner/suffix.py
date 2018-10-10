@@ -56,6 +56,9 @@ def generate_domain(domain):
 
     return check_list
 
+def near_urls(domain):
+    return generate_domain(domain)
+
 if __name__  == "__main__":
     check_list = generate_domain("www.example.com")
     print(check_list)

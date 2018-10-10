@@ -1,4 +1,4 @@
-from homograph_dic import hword
+from .homograph_dic import hword
 import tldextract
 
 def create_homo_domain(thd,sd,td,puny):
@@ -28,7 +28,7 @@ def create_homo_domain(thd,sd,td,puny):
     return result
 
 
-def near_urls(domain,puny):
+def near_urls(domain,puny="punycode"):
     homo_domain=[]
     
     if "http://" in domain:
