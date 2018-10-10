@@ -57,8 +57,12 @@ def main():
     print_progress("generating typo ...")
     generator_dict["typo"]  = typo.near_urls(args.domain_name)[:1]
     print_progress("generated: " + str(len(generator_dict["typo"])))
-    #domains_dict["homo"]   = homo.near_urls(domain)
-    #domains_dict["combo"]  = combo.near_urls(domain)
+    print_progress("generating homograph ...")
+    generator_dict["homo"]  = typo.near_urls(args.domain_name)[:1]
+    print_progress("generated: " + str(len(generator_dict["homo"])))
+    print_progress("generating combo ...")
+    generator_dict["combo"]  = typo.near_urls(args.domain_name)[:1]
+    print_progress("generated: " + str(len(generator_dict["combo"])))
     
     print_progress("fetching domain info ...")
 
