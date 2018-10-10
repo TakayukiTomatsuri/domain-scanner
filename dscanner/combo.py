@@ -1,4 +1,4 @@
-from combo_dic import post_word,pre_word,hyphen_word
+from .combo_dic import post_word,pre_word,hyphen_word
 import tldextract
 
 def create_combo(thd,sd,td):

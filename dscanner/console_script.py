@@ -5,8 +5,8 @@ from dscanner import qr
 from dscanner import suffix
 from dscanner import bit
 from dscanner import typo
-#from dscanner import homo
-#from dscanner import combo
+from dscanner import homo
+from dscanner import combo
 
 import urllib.request
 import urllib.error
@@ -44,26 +44,12 @@ def main():
     # URL候補を取得
     generator_dict = {}
     # TODO: 練習用にリストの長さを制限しているが、本番のときは制限をなくす
-    # TODO: 同じような内容が反復されているので上手くまとめる(呼ぶ関数が違うので単純にforにはしにくいけど)
-    print_progress("generating qr ...")
-    generator_dict["qr"]     = qr.near_urls(args.domain_name)[:1]
-    print_progress("generated: " + str(len(generator_dict["qr"])))
-    print_progress("generating suffix ...")
-    generator_dict["suffix"] = suffix.generate_domain(args.domain_name)[:1]
-    print_progress("generated: " + str(len(generator_dict["suffix"])))
-    print_progress("generating bit ...")
-    generator_dict["bit"]   = bit.near_urls(args.domain_name)[:1]
-    print_progress("generated: " +str( len(generator_dict["bit"])))
-    print_progress("generating typo ...")
-    generator_dict["typo"]  = typo.near_urls(args.domain_name)[:1]
-    print_progress("generated: " + str(len(generator_dict["typo"])))
-    print_progress("generating homograph ...")
-    generator_dict["homo"]  = typo.near_urls(args.domain_name)[:1]
-    print_progress("generated: " + str(len(generator_dict["homo"])))
-    print_progress("generating combo ...")
-    generator_dict["combo"]  = typo.near_urls(args.domain_name)[:1]
-    print_progress("generated: " + str(len(generator_dict["combo"])))
-    
+    generator_names = ["qr", "suffix", "bit", "typo", "homo", "combo"]
+    for generator_name in generator_names:
+        print_progress("generating "+ generator_name  +" ...")
+        generator_dict[generator_name]     = eval(generator_name +".near_urls(args.domain_name)[:1]")
+        print_progress("generated: " + str(len(generator_dict[generator_name])))
+
     print_progress("fetching domain info ...")
 
     # 辞書形式でドメインの情報らを持つ
