@@ -40,12 +40,23 @@ def main():
     p.add_argument('--virustotal', default="", help="Get VirusTotal tool information. must be followed by api key. VERY SLOW ")
     p.add_argument('--ip', action="store_true", help="Get IP address for each candidate domains")
     p.add_argument('--debug', action="store_true", help="For debug. It restlicts the length of domain list.")
+    p.add_argument('--genlist', nargs='+', help="Specify using generators as list.")
+    
     args = p.parse_args()
 
     # URL候補を取得
     generator_dict = {}
-    # TODO: 練習用にリストの長さを制限しているが、本番のときは制限をなくす
-    generator_names = ["qr", "suffix", "bit", "typo", "homo", "combo"]
+    template_generator_names =  ["qr", "suffix", "bit", "typo", "homo", "combo"]
+    generator_names = []
+    # 使うgeneratorが指定された場合
+    if not args.genlist is None:
+        for generator_name in args.genlist:
+            if generator_name in template_generator_names:
+                generator_names.append(generator_name)
+    else:
+        generator_names = template_generator_names
+
+
     for generator_name in generator_names:
         print_progress("generating "+ generator_name  +" ...")
         list_slice = ""
