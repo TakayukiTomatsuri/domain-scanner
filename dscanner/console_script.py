@@ -38,6 +38,7 @@ def main():
     p.add_argument('-g', '--http', action="store_true", help="Get http response by each candidate domains")
     p.add_argument('--safe_site', default="", help="Get google safe sites tool information. must be followed by api key ")
     p.add_argument('--virustotal', default="", help="Get google safe sites tool information. must be followed by api key. VERY SLOW ")
+    p.add_argument('--ip', action="store_true", help="Get IP address for each candidate domains")
     args = p.parse_args()
 
     # URL候補を取得
@@ -126,6 +127,15 @@ def main():
                         # 制限は1分間に4クエリなのだから、1クエリにつき15秒まつのではなく、4クエリ投げたら1分待つ方が正当だが面倒なのでこうした
                         time.sleep(interval_seconds_virustotal)
                         break
+
+            if args.ip:
+                try:
+                    # 生成したドメインの IP アドレスを取得
+                    ip = socket.gethostbyname(domain_name)
+                except socket.gaierror:
+                    ip = ''
+                finally:
+                    domain_info_dict["ip"] = ip
 
             # 追加例：
             # geoip情報を付加する

@@ -101,3 +101,27 @@ Empty `site_threat` means safe.
 	]
 
 
+## Generate and check domains by resolving
+`dscan <domainname> --ip`
+### Result
+
+	generating qr ...
+	generated: 1
+	generating suffix ...
+	generated: 1
+	generating bit ...
+	generated: 1
+	generating typo ...
+	generated: 1
+	fetching domain info ...
+	100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:05<00:00,  1.63s/it]
+	[
+		{
+			"generate_type": [
+				"qr"
+			],
+			"domain_name": "aoogle.com",
+			"ip": "23.253.58.227"
+		},
+		...
+	]
