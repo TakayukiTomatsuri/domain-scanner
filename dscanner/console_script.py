@@ -40,6 +40,7 @@ def main():
     p.add_argument('--virustotal', default="", help="Get VirusTotal tool information. must be followed by api key. VERY SLOW ")
     p.add_argument('--ip', action="store_true", help="Get IP address for each candidate domains")
     p.add_argument('--debug', action="store_true", help="For debug. It restlicts the length of domain list.")
+    # `$ dscan google.com --genlist qr typo` などとして使う
     p.add_argument('--genlist', nargs='+', help="Specify using generators as list.")
     
     args = p.parse_args()
@@ -53,6 +54,8 @@ def main():
         for generator_name in args.genlist:
             if generator_name in template_generator_names:
                 generator_names.append(generator_name)
+            else:
+                print("error: \""+ generator_name +"\" is not generator name.", file=sys.stderr)
     else:
         generator_names = template_generator_names
 
