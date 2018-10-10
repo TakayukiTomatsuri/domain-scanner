@@ -37,8 +37,9 @@ def main():
     p.add_argument("domain_name")
     p.add_argument('-g', '--http', action="store_true", help="Get http response by each candidate domains")
     p.add_argument('--safe_site', default="", help="Get google safe sites tool information. must be followed by api key ")
-    p.add_argument('--virustotal', default="", help="Get google safe sites tool information. must be followed by api key. VERY SLOW ")
+    p.add_argument('--virustotal', default="", help="Get VirusTotal tool information. must be followed by api key. VERY SLOW ")
     p.add_argument('--ip', action="store_true", help="Get IP address for each candidate domains")
+    p.add_argument('--debug', action="store_true", help="For debug. It restlicts the length of domain list.")
     args = p.parse_args()
 
     # URL候補を取得
@@ -47,7 +48,11 @@ def main():
     generator_names = ["qr", "suffix", "bit", "typo", "homo", "combo"]
     for generator_name in generator_names:
         print_progress("generating "+ generator_name  +" ...")
-        generator_dict[generator_name]     = eval(generator_name +".near_urls(args.domain_name)[:1]")
+        list_slice = ""
+        if args.debug:
+           # in debug mode, length of domain list is restricted
+           list_slice = "[:1]"        
+        generator_dict[generator_name]     = eval(generator_name +".near_urls(args.domain_name)" + list_slice)
         print_progress("generated: " + str(len(generator_dict[generator_name])))
 
     print_progress("fetching domain info ...")
