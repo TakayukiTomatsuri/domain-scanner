@@ -1,5 +1,6 @@
 import sys
 import argparse
+import getpass
 
 from dscanner import qr
 from dscanner import suffix
@@ -36,15 +37,21 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("domain_name")
     p.add_argument('-g', '--http', action="store_true", help="Get http response by each candidate domains")
-    p.add_argument('--safe_site', default="", help="Get google safe sites tool information. must be followed by api key ")
-    p.add_argument('--virustotal', default="", help="Get VirusTotal tool information. must be followed by api key. VERY SLOW ")
+    p.add_argument('--safe_site', action="store_true", help="Get google safe sites tool information. It needs api key ")
+    p.add_argument('--virustotal', action="store_true", help="Get VirusTotal tool information. It needs api key. VERY SLOW ")
     p.add_argument('--ip', action="store_true", help="Get IP address for each candidate domains")
     p.add_argument('--debug', action="store_true", help="For debug. It restlicts the length of domain list.")
     args = p.parse_args()
 
+    # api_keyを入力してもらう
+    API_KEYS = {}
+    if args.virustotal:
+        API_KEYS["virustotal"] = getpass.getpass("VirusTotal API_KEY: ")
+    if args.safe_site:
+        API_KEYS["safe_site"] = getpass.getpass("GoogleSafeBrawsing API_KEY: ")
+
     # URL候補を取得
     generator_dict = {}
-    # TODO: 練習用にリストの長さを制限しているが、本番のときは制限をなくす
     generator_names = ["qr", "suffix", "bit", "typo", "homo", "combo"]
     for generator_name in generator_names:
         print_progress("generating "+ generator_name  +" ...")
@@ -93,9 +100,9 @@ def main():
                 domain_info_dict["http_status_code"] = http_status_code
 
             # Google Safe Brawsingの情報を取得
-            if len(args.safe_site)>0:
-                api_key_gsb = args.safe_site
-                sbl = SafeBrowsingList(api_key_gsb)
+            if args.safe_site:
+                # TODO: エラー処理
+                sbl = SafeBrowsingList(API_KEYS["safe_site"])
                 threat_list = sbl.lookup_url(domain_name)
                 if threat_list == None:
                     domain_info_dict["site_threat"] = []
@@ -103,21 +110,23 @@ def main():
                     domain_info_dict["site_threat"] = threat_list
 
             # VirusTotalの情報を取得
-            if len(args.virustotal)>0:
-                api_key_vt = args.virustotal
-
+            if args.virustotal:
                 # TODO:関数とかに後でする
                 interval_seconds_virustotal = 60/4
                 retry_max_time = 2
                 retry_sleep_seconds_virustotal = 1
                 for _ in range(retry_max_time):
                     try:
-                        info_virustotal = fetch_pdns_domain_info(domain_name, api_key_vt)
+                        info_virustotal = fetch_pdns_domain_info(domain_name, API_KEYS["virustotal"])
                     except:
                         # virustotalがrate limitなどなどで取得に失敗した場合はすこし待つ
                         time.sleep(retry_sleep_seconds_virustotal)
                     else:
-                        domain_info_dict["virus_total"] = info_virustotal["Webutation domain info"]
+                        try:
+                            domain_reputation_info = info_virustotal["Webutation domain info"]
+                        except KeyError:
+                            domain_reputation_info = {}
+                        domain_info_dict["virus_total"] = domain_reputation_info
                         # virustotalのrate limitにかからないように60/4 = 15秒ほど寝る
                         # 制限は1分間に4クエリなのだから、1クエリにつき15秒まつのではなく、4クエリ投げたら1分待つ方が正当だが面倒なのでこうした
                         time.sleep(interval_seconds_virustotal)
