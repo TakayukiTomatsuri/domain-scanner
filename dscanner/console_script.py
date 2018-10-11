@@ -1,5 +1,6 @@
 import sys
 import argparse
+import copy
 
 from dscanner import qr
 from dscanner import suffix
@@ -31,6 +32,27 @@ def fetch_pdns_domain_info(domain_name, apikey):
 def print_progress(progress_string):
     print(progress_string, file=sys.stderr)
 
+def domain_filter_only_in_use(domains_dict_original):
+    # Leave the original dict intact
+    domains_dict = copy.deepcopy(domains_dict_original)
+    for domain_name, domain_info in domains_dict_original.items():
+        if "ip" in domain_info:
+            if domain_info["ip"] != "":
+                continue
+        if "virus_total" in domain_info:
+            if len(domain_info["virus_total"]) > 0:
+                continue
+        if "site_threat" in domain_info:
+            if len(domain_info["site_threat"]) > 0:
+                continue
+        if "http_status_code" in domain_info:
+            if domain_info["http_status_code"] != -1:
+                continue
+ 
+        del domains_dict[domain_name]
+
+    return domains_dict
+
 def main():
     # 引数の解釈の準備
     p = argparse.ArgumentParser()
@@ -42,7 +64,8 @@ def main():
     p.add_argument('--debug', action="store_true", help="For debug. It restlicts the length of domain list.")
     # `$ dscan google.com --genlist qr typo` などとして使う
     p.add_argument('--genlist', nargs='+', help="Specify using generators as list.")
-    
+    p.add_argument('--in_use', action="store_true", help="It shows only domains in use.")
+     
     args = p.parse_args()
 
     # URL候補を取得
@@ -131,7 +154,10 @@ def main():
                         # virustotalがrate limitなどなどで取得に失敗した場合はすこし待つ
                         time.sleep(retry_sleep_seconds_virustotal)
                     else:
-                        domain_info_dict["virus_total"] = info_virustotal["Webutation domain info"]
+                        try:
+                            domain_info_dict["virus_total"] = info_virustotal["Webutation domain info"]
+                        except KeyError:
+                            domain_info_dict["virus_total"] = {}
                         # virustotalのrate limitにかからないように60/4 = 15秒ほど寝る
                         # 制限は1分間に4クエリなのだから、1クエリにつき15秒まつのではなく、4クエリ投げたら1分待つ方が正当だが面倒なのでこうした
                         time.sleep(interval_seconds_virustotal)
@@ -151,6 +177,9 @@ def main():
             # if args.geoip:
             #     domain_info_dict["geoip"] = country
     
+    if args.in_use:
+        domains_dict = domain_filter_only_in_use(domains_dict)    
+   
     print_list = []
     for domain_info_dict in domains_dict.values():
         print_list.append(domain_info_dict)
