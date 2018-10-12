@@ -47,9 +47,17 @@ optional arguments:
 
 ```
 
+## genlist
+genlist オプションに類似ドメインの生成方法を明示的に指定できます。
+```
+GENLIST = qr | suffix | bit | typo | homo | combo
+```
 ## example
 ### Generate domains
 `dscan <domainname>`
+
+### Generate domains with generation method specified
+`dscan <domainname> --genlist typo homo combo`
 
 ### Generate and check domains with GET request
 `dscan <domainname> --http`
@@ -169,3 +177,10 @@ Empty `site_threat` means safe.
 		},
 		...
 	]
+
+## Output
+ドメインの生成結果とチェック結果は json として標準出力に出力されます
+
+`dscan <domainname> --http > output.json`
+
+`dscan <domainname> | jq '.[].domain_name`
