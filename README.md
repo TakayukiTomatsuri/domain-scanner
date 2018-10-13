@@ -8,6 +8,7 @@
 * (通信路において)1bit反転するとなるドメイン名
 * ハイフンで単語を繋げたドメイン名(ex. google.com -> google-recruit.com)
 * 国際化ドメイン名で見間違いやすいドメイン名(ホモグラフドメイン、ex. kawasaki.com -> кawasaki.com 、kがキリル文字)
+* 異なるTLD配下で取得されているドメイン名(ex. google.com -> google.xyz)
 
 ドメインのチェックに使える項目は以下です。
 
@@ -90,12 +91,12 @@ GENLIST = qr | suffix | bit | typo | homo | combo
 	    },
 		 ...
 	]
-	
+
 ### Generate and check domains with Virus Total
 `dscan <domainname> --http --virustotal <here VirusTotal API key>`  
 VERY SLOW.  
 #### Result
-	
+
 	generating qr ...
 	generated: 49
 	generating suffix ...
